@@ -143,6 +143,8 @@ typedef enum : NSUInteger {
     if (self.isWK) {
         [self resetScrollView];
     }
+ 
+    self.webView.scrollView.scrollEnabled = false;
 
     NSString *js = [NSString stringWithFormat:@"Keyboard.fireOnShow(%d);", (int)height];
     [self.commandDelegate evalJs:js];
