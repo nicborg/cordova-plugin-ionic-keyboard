@@ -22,6 +22,9 @@
 #import <Cordova/NSDictionary+CordovaPreferences.h>
 #import <objc/runtime.h>
 
+CGPoint oldOffset = { 0.0, 0.0 };
+UIScrollView *oldScrollDelegate = nil;
+
 typedef enum : NSUInteger {
     ResizeNone,
     ResizeNative,
@@ -130,6 +133,10 @@ typedef enum : NSUInteger {
         [self setKeyboardHeight:height delay:duration/2.0];
         [self resetScrollView];
     }
+ 
+    oldScrollDelegate = self.webView.scrollView.delegate;
+    oldOffset = self.webView.scrollView.contentOffset;
+    self.webView.scrollView.delegate = self; 
 
     NSString *js = [NSString stringWithFormat:@"Keyboard.fireOnShowing(%d);", (int)height];
     [self.commandDelegate evalJs:js];
@@ -144,6 +151,7 @@ typedef enum : NSUInteger {
         [self resetScrollView];
     }
  
+    self.webView.scrollView.delegate = oldScrollDelegate;
     self.webView.scrollView.scrollEnabled = false;
 
     NSString *js = [NSString stringWithFormat:@"Keyboard.fireOnShow(%d);", (int)height];
@@ -294,6 +302,9 @@ static IMP WKOriginalImp;
     }
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    scrollView.contentOffset = oldOffset;
+}
 
 #pragma mark dealloc
 
